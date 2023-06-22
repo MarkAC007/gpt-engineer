@@ -1,0 +1,162 @@
+I will be using Python with Flask for the web app and pandas for CSV file manipulation. Here are the core classes, functions, and methods that will be necessary:
+
+1. `app.py`: Entry point for the Flask web app
+   - `index()`: Renders the main page with file selection and submit button
+   - `upload_files()`: Handles file uploads and initiates the comparison process
+   - `compare_files()`: Compares the uploaded CSV files and returns the differences
+   - `export_results()`: Exports the comparison results in the selected format (CSV, PDF, or Word)
+
+2. `templates/index.html`: Main HTML template for the web app
+   - File selection functionality
+   - Submit button
+   - Console window for progress and interaction
+   - Placeholder for logo
+
+3. `static/css/styles.css`: CSS styles for the web app
+
+4. `requirements.txt`: Lists the required Python packages
+
+5. `README.md`: Provides instructions for installation and usage
+
+Now, I will provide the content of each file.
+
+app.py
+```python
+from flask import Flask, render_template, request, send_file
+import pandas as pd
+import io
+import csv
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_files():
+    file1 = request.files['file1']
+    file2 = request.files['file2']
+    df1 = pd.read_csv(file1)
+    df2 = pd.read_csv(file2)
+    result = compare_files(df1, df2)
+    return result.to_html()
+
+def compare_files(df1, df2):
+    common_columns = set(df1.columns) & set(df2.columns)
+    common_columns.discard('Column ID')
+    df1.set_index('Column ID', inplace=True)
+    df2.set_index('Column ID', inplace=True)
+    differences = df1[common_columns].compare(df2[common_columns])
+    return differences
+
+@app.route('/export', methods=['POST'])
+def export_results():
+    export_format = request.form['export_format']
+    differences = request.form['differences']
+    if export_format == 'csv':
+        return export_csv(differences)
+    elif export_format == 'pdf':
+        return export_pdf(differences)
+    elif export_format == 'word':
+        return export_word(differences)
+
+def export_csv(differences):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    for row in differences:
+        writer.writerow(row)
+    output.seek(0)
+    return send_file(output, attachment_filename='differences.csv', as_attachment=True)
+
+def export_pdf(differences):
+    # Implement PDF export functionality
+    pass
+
+def export_word(differences):
+    # Implement Word export functionality
+    pass
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+templates/index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Comparison Tool</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>CSV Comparison Tool</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file1" accept=".csv" multiple>
+            <input type="file" name="file2" accept=".csv" multiple>
+            <button type="submit">Compare</button>
+        </form>
+        <div class="console">
+            <!-- Console window for progress and interaction -->
+        </div>
+    </div>
+</body>
+</html>
+```
+
+static/css/styles.css
+```css
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.console {
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-height: 200px;
+    margin-top: 20px;
+}
+```
+
+requirements.txt
+```
+Flask==2.1.1
+pandas==1.4.1
+```
+
+README.md
+```
+# CSV Comparison Tool
+
+A web app to compare two CSV files and output a report on the differences found.
+
+## Installation
+
+1. Install Python 3.6 or higher
+2. Clone this repository
+3. Install the required packages by running `pip install -r requirements.txt`
+
+## Usage
+
+1. Run the web app by executing `python app.py`
+2. Open your browser and navigate to `http://localhost:5000`
+3. Select the CSV files to compare and click the "Compare" button
+4. Interact with the results by sorting and filtering
+5. Export the results in CSV, PDF, or Word format
+```

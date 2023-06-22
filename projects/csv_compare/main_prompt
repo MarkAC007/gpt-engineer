@@ -1,0 +1,11 @@
+I would like you to build a web app that compares 2 CSV files and outputs a report on the differances found.  The app must have the following features.
+1. File select fuctionally to load files to be compared.
+2. Submit button
+3. Console window that show progress, and can interact with the user.
+4. Ask the user which columns to compare from the loaded csv files.  More than one column can be selected.
+5. The Column ID should be used as the main key to compare each record.
+6. the site needs to have a clean look and feel, with a place holder for a logo.
+7. after the compare has completed, the user should be able to interact with the results by sorting and filtering.
+8. the results should be exportable in the format of CSV, PDF, or word.
+9. the app must be able to be packaged as a docker image.
+10. a README.md file must be provided
