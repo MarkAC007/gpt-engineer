@@ -43,7 +43,8 @@ def export_csv(differences):
     for row in differences:
         writer.writerow(row)
     output.seek(0)
-    return send_file(output, attachment_filename='differences.csv', as_attachment=True)
+    output = io.BytesIO(output.getvalue().encode('utf-8'))
+    return send_file(output, attachment_filename='differences.csv', as_attachment=True, mimetype='text/csv')
 
 def export_pdf(differences):
     # Implement PDF export functionality
